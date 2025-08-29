@@ -1,210 +1,203 @@
-# 🚀 Demonstração Rápida - Site MNTN
+# 🎯 Demonstração do Medical AI Report
 
-## 🎯 O que foi criado
+## 🚀 Como Testar o Site
 
-Um site completo e profissional para a marca MNTN, baseado no design do Figma que você compartilhou. O site inclui:
+### 1. **Abrir o Site**
+- Abra o arquivo `index.html` em qualquer navegador moderno
+- O site carregará com todas as funcionalidades
 
-### ✨ Características Principais
+### 2. **Testar o Formulário**
+Preencha os campos com dados de exemplo:
 
-- **Header fixo** com logo MNTN e navegação
-- **Hero section** com título impactante e badge
-- **3 seções de conteúdo** com layout alternado
-- **Footer** com informações da empresa
-- **Totalmente responsivo** para todos os dispositivos
-
-## 🎨 Design e Layout
-
-### Paleta de Cores
-
-- **Azul escuro**: `#0B1D26` (fundo principal)
-- **Dourado**: `#FBD784` (destaques e badges)
-- **Branco**: `#FFFFFF` (texto principal)
-
-### Tipografia
-
-- **Títulos**: Fonte serif elegante (Chronicle Display)
-- **Corpo**: Fonte sans-serif moderna (Inter)
-
-## 🖥️ Como Visualizar
-
-### 1. Abrir o Site
-
-```bash
-# Navegue até a pasta do projeto
-cd mntn-website
-
-# Abra o arquivo HTML
-open index.html
-# ou
-start index.html  # Windows
+```
+Nome do Paciente: João Silva
+Idade: 35
+Gênero: Masculino
+Peso: 75
+Altura: 175
+Sintomas: Dor de cabeça intensa, náuseas, sensibilidade à luz
+Histórico Médico: Hipertensão controlada, sem alergias conhecidas
 ```
 
-### 2. Servidor Local (Recomendado)
+### 3. **Testar Upload de Imagens**
+- **Opção 1**: Clique na área de upload e selecione imagens
+- **Opção 2**: Arraste e solte imagens na área de upload
+- **Tipos aceitos**: JPG, PNG, GIF, WebP
+- **Tamanho máximo**: 10MB por arquivo
 
-```bash
-# Python 3
-python -m http.server 8000
+### 4. **Gerar Relatório**
+- Clique em "Gerar Relatório"
+- Observe o modal de carregamento
+- Aguarde 3 segundos (simulação)
+- Visualize o relatório gerado
 
-# Acesse: http://localhost:8000
+## 🎨 Funcionalidades para Testar
+
+### ✅ **Validação de Formulário**
+- Tente enviar sem preencher campos obrigatórios
+- Observe as mensagens de erro
+- Teste com dados inválidos
+
+### ✅ **Sistema de Upload**
+- Faça upload de diferentes tipos de arquivo
+- Teste o limite de tamanho
+- Remova arquivos da lista
+- Adicione múltiplos arquivos
+
+### ✅ **Geração de Relatórios**
+- Teste com diferentes sintomas
+- Observe as recomendações da IA
+- Verifique o cálculo automático de IMC
+- Teste a classificação de urgência
+
+### ✅ **Responsividade**
+- Redimensione a janela do navegador
+- Teste em diferentes dispositivos
+- Verifique a adaptação do layout
+
+### ✅ **Notificações**
+- Observe as mensagens de sucesso/erro
+- Teste o auto-removimento
+- Verifique diferentes tipos de notificação
+
+## 🔍 Casos de Teste Específicos
+
+### **Caso 1: Paciente com Dor Torácica**
+```
+Sintomas: Dor no peito, falta de ar, suor frio
+Resultado esperado: Urgência ALTA, recomendações cardiológicas
 ```
 
-## 🎭 Funcionalidades Interativas
+### **Caso 2: Paciente com Sintomas Gripais**
+```
+Sintomas: Febre, tosse, dor de garganta
+Resultado esperado: Urgência BAIXA, recomendações de repouso
+```
 
-### Navegação por Slider
+### **Caso 3: Paciente Idoso**
+```
+Idade: 70 anos
+Resultado esperado: Fatores de risco adicionais, avaliação geriátrica
+```
 
-- Clique nos números (Start, 01, 02, 03) no lado direito
-- O indicador se move automaticamente
-- Scroll suave para a seção correspondente
+### **Caso 4: Paciente com IMC Alto**
+```
+Peso: 90kg, Altura: 165cm
+Resultado esperado: IMC calculado, recomendações nutricionais
+```
 
-### Efeitos de Hover
+## 🎯 Funcionalidades Avançadas
 
-- Links mudam de cor
-- Ícones sociais têm animações
-- Imagens têm efeitos de escala
+### **Drag & Drop**
+- Arraste imagens de outras abas do navegador
+- Teste com múltiplos arquivos simultaneamente
+- Verifique o feedback visual durante o processo
 
-### Scroll Responsivo
+### **Sistema de Notificações**
+- Teste diferentes cenários de erro
+- Observe a animação de entrada
+- Verifique o posicionamento na tela
 
-- Header muda de opacidade
-- Animações de entrada para conteúdo
-- Efeito parallax no background
+### **Relatório Responsivo**
+- Teste a impressão (Ctrl+P)
+- Verifique a adaptação para diferentes tamanhos
+- Teste a navegação entre seções
 
-## 📱 Responsividade
+### **Validação em Tempo Real**
+- Digite dados inválidos nos campos
+- Observe as mensagens de validação
+- Teste a navegação por tab
 
-### Desktop (1920px+)
+## 🐛 Cenários de Erro para Testar
 
-- Layout completo com todas as funcionalidades
-- Slider lateral funcional
-- Links sociais verticais
+### **Upload de Arquivos**
+- Arquivo muito grande (>10MB)
+- Tipo de arquivo não suportado
+- Tentativa de upload sem arquivos
 
-### Tablet (768px - 1199px)
+### **Validação de Formulário**
+- Campos obrigatórios vazios
+- Idade negativa ou muito alta
+- Peso/altura inválidos
 
-- Layout adaptado para telas médias
-- Conteúdo reorganizado
-- Navegação otimizada
+### **Geração de Relatório**
+- Tentativa de gerar sem dados
+- Múltiplos cliques no botão
+- Interrupção durante o processamento
 
-### Mobile (320px - 767px)
+## 📱 Teste de Responsividade
 
-- Menu hambúrguer para navegação
-- Layout em coluna única
-- Elementos sociais reorganizados horizontalmente
+### **Desktop (>768px)**
+- Layout em 2 colunas
+- Navegação horizontal
+- Elementos lado a lado
 
-## 🔧 Estrutura do Código
+### **Tablet (768px)**
+- Formulário em coluna única
+- Navegação adaptada
+- Elementos empilhados
 
-### HTML (`index.html`)
+### **Mobile (<480px)**
+- Layout vertical completo
+- Botões empilhados
+- Texto otimizado para leitura
 
-- Estrutura semântica e acessível
-- Seções bem organizadas
-- Links internos funcionais
+## 🎨 Teste de Acessibilidade
 
-### CSS (`styles.css`)
+### **Navegação por Teclado**
+- Use Tab para navegar
+- Enter para ativar botões
+- Escape para fechar modais
 
-- Estilos modernos e responsivos
-- Animações CSS suaves
-- Media queries para diferentes dispositivos
+### **Leitores de Tela**
+- Labels associados corretamente
+- Textos alternativos para ícones
+- Estrutura semântica adequada
 
-### JavaScript (`script.js`)
+### **Contraste e Legibilidade**
+- Texto legível em diferentes fundos
+- Cores com contraste adequado
+- Tamanhos de fonte apropriados
 
-- Interatividade avançada
-- Navegação por slider
-- Efeitos de scroll e hover
-- Menu mobile responsivo
+## 🚀 Próximos Passos para Desenvolvimento
 
-## 🎯 Seções do Site
+### **Integração com IA Real**
+- Conectar com API de análise médica
+- Implementar processamento de imagens
+- Adicionar machine learning
 
-### 1. Header
+### **Funcionalidades Avançadas**
+- Sistema de usuários
+- Histórico de relatórios
+- Exportação para PDF
+- Banco de dados
 
-- Logo MNTN animado
-- Menu de navegação
-- Ícone de conta
+### **Melhorias de UX**
+- Autocomplete para sintomas
+- Templates de relatórios
+- Personalização de interface
+- Temas escuro/claro
 
-### 2. Hero Section
+## 📊 Métricas de Performance
 
-- Título: "Be prepared for the Mountains and beyond!"
-- Badge: "A Hiking guide"
-- Indicador de scroll
-- Links sociais
-- Navegação por slider
+### **Tempo de Carregamento**
+- HTML: <100ms
+- CSS: <200ms
+- JavaScript: <300ms
+- Total: <600ms
 
-### 3. Seção 01 - Get Started
+### **Responsividade**
+- Breakpoint mobile: 480px
+- Breakpoint tablet: 768px
+- Breakpoint desktop: 1200px
 
-- Número grande: "01"
-- Título: "Get Started"
-- Subtítulo: "What level of hiker are you?"
-- Descrição sobre níveis de trilha
-
-### 4. Seção 02 - Hiking Essentials
-
-- Número grande: "02"
-- Título: "Hiking Essentials"
-- Subtítulo: "Picking the right Hiking Gear!"
-- Dicas sobre equipamentos
-
-### 5. Seção 03 - Navigation
-
-- Número grande: "03"
-- Título: "Where you go is the key"
-- Subtítulo: "Understand Your Map & Timing"
-- Conselhos sobre navegação
-
-### 6. Footer
-
-- Logo MNTN
-- Descrição da empresa
-- Links úteis organizados
-- Copyright
-
-## 🚀 Próximos Passos
-
-### 1. Adicionar Imagens Reais
-
-- Veja o arquivo `IMAGENS.md` para instruções
-- Substitua os placeholders por fotos reais
-- Otimize para web
-
-### 2. Personalizar Conteúdo
-
-- Edite os textos no HTML
-- Ajuste cores no CSS
-- Modifique funcionalidades no JavaScript
-
-### 3. Deploy
-
-- Hospede em qualquer servidor web
-- Use GitHub Pages para demonstração
-- Considere Vercel ou Netlify para produção
-
-## 🎉 Resultado Final
-
-O site MNTN está pronto para uso e inclui:
-
-✅ **Design profissional** baseado no Figma  
-✅ **Código limpo e organizado**  
-✅ **Totalmente responsivo**  
-✅ **Animações suaves**  
-✅ **Navegação intuitiva**  
-✅ **Performance otimizada**  
-✅ **Acessibilidade básica**
-
-## 🔍 Testando o Site
-
-### Funcionalidades para Testar
-
-1. **Scroll da página** - veja as animações
-2. **Clique no slider** - navegue entre seções
-3. **Hover nos links** - veja as mudanças de cor
-4. **Redimensione a janela** - teste a responsividade
-5. **Use as setas do teclado** - navegação alternativa
-
-### Navegadores para Testar
-
-- Chrome (recomendado)
-- Firefox
-- Safari
-- Edge
+### **Compatibilidade**
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
 ---
 
-**🎯 O site está pronto para uso!**
-
-Abra o `index.html` em seu navegador para ver o resultado final. Todas as funcionalidades estão implementadas e funcionando perfeitamente.
+**🎯 Use esta demonstração para testar todas as funcionalidades do site e identificar possíveis melhorias!**
 

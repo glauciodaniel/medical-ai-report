@@ -20,8 +20,8 @@ class HuggingFaceService:
     
     def __init__(self, api_token: str):
         self.api_token = api_token
-        self.base_url = "https://api-inference.huggingface.co/models"
-        self.medgemma_url = f"{self.base_url}/google/medgemma-2b"
+        self.base_url = "https://r2y80g16msuhn4pg.us-east-1.aws.endpoints.huggingface.cloud"
+        self.medgemma_url = f"{self.base_url}"
         self.headers = {
             "Authorization": f"Bearer {api_token}",
             "Content-Type": "application/json"
@@ -140,35 +140,38 @@ class HuggingFaceService:
             image.save(buffered, format="PNG")
             image_b64 = base64.b64encode(buffered.getvalue()).decode()
             
-            # Prepare API payload
+            # Prepare API payload for multimodal model
             payload = {
                 "inputs": prompt,
+                "image": f"data:image/png;base64,{image_b64}",
                 "parameters": {
-                    "max_new_tokens": 1500,
+                    "max_new_tokens": 2048,
                     "temperature": 0.7,
+                    "return_full_text": False,
+                    "do_sample": True, 
                     "top_p": 0.95,
-                    "do_sample": True,
                     "repetition_penalty": 1.1
                 }
             }
             
-            # Make API request
+            # Make API request with increased timeout
             response = requests.post(
                 self.medgemma_url,
                 headers=self.headers,
                 json=payload,
-                timeout=60
+                timeout=180  # Aumentado para 2 minutos
             )
             
             if response.status_code == 503:
-                # Model is loading, wait and retry
+                # Model is loading, wait and retry with longer timeout
                 import time
-                time.sleep(10)
+                print("⏳ Modelo carregando... aguardando 20 segundos...")
+                time.sleep(20)
                 response = requests.post(
                     self.medgemma_url,
                     headers=self.headers,
                     json=payload,
-                    timeout=60
+                    timeout=180  # 3 minutos para retry
                 )
             
             if response.status_code != 200:
@@ -180,8 +183,8 @@ class HuggingFaceService:
             
             if isinstance(result, list) and len(result) > 0:
                 generated_text = result[0].get('generated_text', '')
-                # Remove the original prompt from the response
-                report = generated_text.replace(prompt, '').strip()
+                # Com return_full_text=False, não precisa remover o prompt
+                report = generated_text.strip()
             else:
                 raise Exception("Formato de resposta inválido da API Hugging Face")
             

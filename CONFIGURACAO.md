@@ -1,235 +1,339 @@
-# Configuração da Conexão Frontend-Backend
+# ⚙️ Configuração do Medical AI Report
 
-## Visão Geral
+## 🎨 Personalização de Cores
 
-Este projeto consiste em um frontend Next.js que se comunica com um backend Python FastAPI para gerar relatórios médicos usando IA.
+### Cores Principais
+```css
+/* Cores principais - Edite no arquivo styles.css */
 
-## Estrutura do Projeto
+/* Header e navegação */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 
-```
-medical-ai-report/
-├── app/                    # Frontend Next.js
-├── backend/               # Backend Python FastAPI
-├── components/            # Componentes React
-├── lib/                   # Utilitários e configurações
-└── ...
-```
+/* Botão principal */
+.generate-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 
-## Configuração do Backend
+/* Hero section */
+.hero {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
 
-### 1. Instalar Dependências
+/* Relatório - cabeçalho */
+.report-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
 
-```bash
-cd backend
-pip install -r requirements.txt
-```
+/* Botões de ação */
+.download-btn {
+    background: #10b981;
+}
 
-### 2. Configurar Token da API Hugging Face
-
-**IMPORTANTE**: Este é o passo mais importante para usar o modelo MedGemma!
-
-Crie um arquivo `.env` na pasta `backend/` com:
-
-```env
-HUGGINGFACE_API_TOKEN=seu-token-real-aqui
-```
-
-**Como obter o token:**
-
-1. Acesse [Hugging Face](https://huggingface.co/)
-2. Faça login ou crie uma conta
-3. Vá em Settings → Access Tokens
-4. Crie um novo token com permissões de leitura
-5. Copie o token e cole no arquivo `.env`
-
-**Exemplo de arquivo `.env`:**
-
-```env
-HUGGINGFACE_API_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-MEDGEMMA_MODEL_URL=https://api-inference.huggingface.co/models/google/medgemma-2b
-API_HOST=0.0.0.0
-API_PORT=8000
-CORS_ORIGINS=http://localhost:3000
-MAX_NEW_TOKENS=1000
-TEMPERATURE=0.7
-TOP_P=0.9
+.print-btn {
+    background: #6b7280;
+}
 ```
 
-**Configurações opcionais:**
-
-- `MEDGEMMA_MODEL_URL`: URL do modelo (padrão: MedGemma 2B)
-- `MAX_NEW_TOKENS`: Máximo de tokens gerados (padrão: 1000)
-- `TEMPERATURE`: Criatividade do modelo (padrão: 0.7)
-- `TOP_P`: Controle de diversidade (padrão: 0.9)
-
-### 3. Executar o Backend
-
-```bash
-cd backend
-python main.py
+### Paleta de Cores Completa
+```css
+:root {
+    /* Cores primárias */
+    --primary-blue: #667eea;
+    --primary-purple: #764ba2;
+    --primary-pink: #f093fb;
+    --primary-red: #f5576c;
+    
+    /* Cores de status */
+    --success-green: #10b981;
+    --warning-yellow: #f59e0b;
+    --error-red: #ef4444;
+    --info-blue: #3b82f6;
+    
+    /* Cores neutras */
+    --text-dark: #1e293b;
+    --text-medium: #64748b;
+    --text-light: #94a3b8;
+    --background-light: #f8fafc;
+    --border-color: #e5e7eb;
+}
 ```
 
-O backend estará disponível em: `http://localhost:8000`
+## 🔤 Personalização de Fontes
 
-## Configuração do Frontend
-
-### 1. Instalar Dependências
-
-```bash
-npm install
+### Google Fonts
+```html
+<!-- No arquivo index.html, linha 8 -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 ```
 
-### 2. Configurar URL do Backend
-
-Crie um arquivo `.env.local` na raiz do projeto:
-
-```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+### Alterar Fonte Principal
+```css
+/* No arquivo styles.css */
+body {
+    font-family: 'Sua Fonte', 'Inter', sans-serif;
+}
 ```
 
-### 3. Executar o Frontend
+### Tamanhos de Fonte
+```css
+/* Títulos */
+.hero h1 { font-size: 3rem; }
+.form-header h2 { font-size: 2rem; }
+.report-header h2 { font-size: 1.5rem; }
 
-```bash
-npm run dev
+/* Texto do corpo */
+body { font-size: 1rem; }
+.hero p { font-size: 1.2rem; }
+.form-header p { font-size: 1.1rem; }
 ```
 
-O frontend estará disponível em: `http://localhost:3000`
+## 📱 Configuração de Responsividade
 
-## Verificação da Conexão
+### Breakpoints
+```css
+/* Tablet */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
 
-### 1. Status do Backend
-
-O componente `BackendStatus` na interface mostra:
-
-- 🟢 **ONLINE**: Backend conectado e funcionando
-- 🔴 **OFFLINE**: Backend não está acessível
-- 🟡 **VERIFICANDO**: Testando conectividade
-
-### 2. Teste Manual
-
-Acesse: `http://localhost:8000/health`
-Resposta esperada: `{"status": "healthy", "pil_available": true/false}`
-
-### 3. Verificar Configuração do Hugging Face
-
-O backend agora verifica automaticamente se o token está configurado:
-
-**Se o token estiver configurado corretamente:**
-
-- O sistema tentará usar o modelo MedGemma
-- Você verá a mensagem: "Relatório gerado com sucesso usando modelo MedGemma"
-
-**Se o token não estiver configurado:**
-
-- Você verá a mensagem: "Token da API Hugging Face não configurado"
-- O sistema retornará um relatório demonstrativo
-
-### 4. Diagnóstico Automático
-
-Se o modelo não estiver funcionando, execute o script de diagnóstico:
-
-```bash
-cd backend
-python diagnose.py
+/* Mobile */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+}
 ```
 
-Este script verificará:
-
-- ✅ Arquivo `.env` existe e está configurado
-- ✅ Variáveis de ambiente estão carregadas
-- ✅ Dependências Python estão instaladas
-- ✅ Configuração pode ser importada
-
-## Endpoints da API
-
-### Backend Python (`localhost:8000`)
-
-- `GET /` - Página inicial
-- `GET /health` - Status de saúde
-- `POST /generate_report` - Gerar relatório médico
-
-### Frontend Next.js (`localhost:3000`)
-
-- `/` - Interface principal
-- `/api/generate_report` - **DEPRECIADO** (agora chama diretamente o backend)
-
-## Fluxo de Dados
-
-1. **Upload de Imagem**: Usuário faz upload de imagem médica
-2. **Dados do Paciente**: Preenchimento de idade, peso e histórico
-3. **Requisição ao Backend**: Frontend envia dados para `localhost:8000/generate_report`
-4. **Processamento IA**: Backend processa imagem com modelo MedGemma
-5. **Resposta**: Relatório médico retorna para o frontend
-6. **Exibição**: Relatório é mostrado na interface
-
-## Solução de Problemas
-
-### Backend não conecta
-
-- Verifique se o Python está rodando na porta 8000
-- Confirme se as dependências estão instaladas
-- Verifique logs de erro no terminal
-
-### CORS Errors
-
-- O backend já está configurado com CORS habilitado
-- Se persistir, verifique se o frontend está na origem permitida
-
-### Token do Hugging Face não funciona
-
-- Verifique se o arquivo `.env` está na pasta `backend/`
-- Confirme se o token começa com `hf_`
-- Teste o token no site do Hugging Face
-- Verifique se o token tem permissões de leitura
-
-### Imagem não processa com IA
-
-- Verifique se o token da API Hugging Face está configurado corretamente
-- Confirme se a imagem está em formato suportado (JPG, PNG)
-- Verifique o tamanho da imagem (máximo 10MB)
-- Verifique os logs do backend para erros específicos da API
-
-### Erro "Invalid response format from Hugging Face API"
-
-- A API do Hugging Face pode retornar diferentes formatos
-- O sistema foi atualizado para lidar com múltiplos formatos
-- Se persistir, verifique se o modelo MedGemma está disponível
-
-## Configuração de Produção
-
-### Backend
-
-```python
-# Em main.py, altere:
-allow_origins=["https://seu-dominio.com"]  # Ao invés de ["*"]
+### Container Width
+```css
+.container {
+    max-width: 1200px; /* Alterar para diferentes tamanhos */
+    margin: 0 auto;
+    padding: 0 20px;
+}
 ```
 
-### Frontend
+## 🎯 Personalização de Funcionalidades
 
-```env
-NEXT_PUBLIC_BACKEND_URL=https://seu-backend.com
+### Limite de Upload
+```javascript
+// No arquivo script.js, linha 95
+if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    showNotification('Arquivo muito grande. Tamanho máximo: 10MB.', 'error');
+    return false;
+}
 ```
 
-## Arquivos de Configuração
+### Tempo de Simulação
+```javascript
+// No arquivo script.js, linha 320
+async function simulateReportGeneration() {
+    return new Promise((resolve) => {
+        setTimeout(resolve, 3000); // 3 segundos - alterar conforme necessário
+    });
+}
+```
 
-- `lib/config.ts` - Configurações da API
-- `env.example` - Exemplo de variáveis de ambiente
-- `backend/main.py` - Configurações do servidor FastAPI
+### Validação de Campos
+```javascript
+// No arquivo script.js, linha 300
+const requiredFields = [
+    'patientName', 
+    'patientAge', 
+    'patientGender', 
+    'patientWeight', 
+    'patientHeight', 
+    'patientSymptoms'
+];
+```
 
-## Dependências Principais
+## 🖼️ Personalização de Imagens e Ícones
 
-### Backend
+### Ícones Font Awesome
+```html
+<!-- No arquivo index.html, linha 9 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+```
 
-- FastAPI
-- Uvicorn
-- Pillow (PIL)
-- Requests
-- Transformers (Hugging Face)
+### Alterar Ícones
+```html
+<!-- Logo -->
+<i class="fas fa-brain"></i> <!-- Alterar para outro ícone -->
 
-### Frontend
+<!-- Upload -->
+<i class="fas fa-cloud-upload-alt"></i>
 
-- Next.js 14
-- React
-- TypeScript
-- Tailwind CSS
-- Shadcn/ui
+<!-- Botão gerar -->
+<i class="fas fa-magic"></i>
+
+<!-- Botões de ação -->
+<i class="fas fa-download"></i>
+<i class="fas fa-print"></i>
+```
+
+### Adicionar Imagens de Fundo
+```css
+.hero {
+    background-image: url('sua-imagem.jpg');
+    background-size: cover;
+    background-position: center;
+}
+```
+
+## 📝 Personalização de Textos
+
+### Textos Principais
+```html
+<!-- Título principal -->
+<h1>Sistema de Diagnóstico Inteligente</h1>
+
+<!-- Subtítulo -->
+<p>Utilize inteligência artificial para gerar relatórios médicos precisos e detalhados</p>
+
+<!-- Título do formulário -->
+<h2>Informações do Paciente</h2>
+
+<!-- Botão principal -->
+<button type="submit" class="generate-btn">
+    <i class="fas fa-magic"></i>
+    Gerar Relatório
+</button>
+```
+
+### Mensagens de Validação
+```javascript
+// No arquivo script.js
+showNotification('Por favor, selecione apenas arquivos de imagem.', 'error');
+showNotification('Arquivo muito grande. Tamanho máximo: 10MB.', 'error');
+showNotification('Relatório gerado com sucesso!', 'success');
+```
+
+## 🔧 Configurações Avançadas
+
+### Animações CSS
+```css
+/* Velocidade das transições */
+* {
+    transition: all 0.3s ease; /* Alterar 0.3s para velocidade desejada */
+}
+
+/* Animações personalizadas */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+```
+
+### Notificações
+```javascript
+// Duração das notificações
+setTimeout(() => {
+    if (notification.parentElement) {
+        notification.remove();
+    }
+}, 5000); // 5 segundos - alterar conforme necessário
+```
+
+### Z-Index
+```css
+/* Camadas de elementos */
+.header { z-index: 1000; }
+.loading-modal { z-index: 2000; }
+.notification { z-index: 3000; }
+```
+
+## 🌐 Configurações de SEO
+
+### Meta Tags
+```html
+<!-- No arquivo index.html -->
+<meta name="description" content="Sistema de diagnóstico médico inteligente usando IA">
+<meta name="keywords" content="medicina, IA, diagnóstico, relatórios médicos">
+<meta name="author" content="Seu Nome">
+<meta name="robots" content="index, follow">
+```
+
+### Open Graph
+```html
+<meta property="og:title" content="Medical AI Report">
+<meta property="og:description" content="Sistema de diagnóstico inteligente">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://seusite.com">
+```
+
+## 📊 Configurações de Performance
+
+### Otimizações CSS
+```css
+/* Usar transform em vez de propriedades que causam reflow */
+.element:hover {
+    transform: translateY(-2px); /* Melhor performance */
+}
+
+/* Evitar animações em propriedades que causam reflow */
+.element:hover {
+    /* ❌ Evitar */
+    margin-top: -2px;
+    
+    /* ✅ Usar */
+    transform: translateY(-2px);
+}
+```
+
+### Lazy Loading
+```html
+<!-- Para imagens futuras -->
+<img src="imagem.jpg" loading="lazy" alt="Descrição">
+```
+
+## 🚀 Configurações de Deploy
+
+### Variáveis de Ambiente
+```javascript
+// Para futuras integrações com APIs
+const API_BASE_URL = 'https://sua-api.com';
+const API_KEY = 'sua-chave-api';
+```
+
+### Configurações de Build
+```json
+// package.json para futuras funcionalidades
+{
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development"
+  }
+}
+```
+
+## 🔒 Configurações de Segurança
+
+### Headers de Segurança
+```html
+<!-- Para servidores que suportam -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+```
+
+### Validação de Entrada
+```javascript
+// Sempre validar dados do usuário
+function sanitizeInput(input) {
+    return input.replace(/[<>]/g, '');
+}
+```
+
+---
+
+**💡 Use estas configurações para personalizar o site conforme suas necessidades específicas!**

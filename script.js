@@ -1,185 +1,34 @@
 // Aguarda o carregamento completo da página
 document.addEventListener("DOMContentLoaded", function () {
-  // Elementos do DOM
-  const header = document.querySelector(".header");
-  const sliderNumbers = document.querySelectorAll(".slider-number");
-  const sliderIndicator = document.querySelector(".slider-indicator");
-  const scrollIndicator = document.querySelector(".scroll-indicator");
-  const navLinks = document.querySelectorAll(".nav-link");
-
   // Header scroll effect
+  const header = document.querySelector(".header");
+  let lastScrollTop = 0;
+
   window.addEventListener("scroll", function () {
-    if (window.scrollY > 100) {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (scrollTop > 100) {
       header.style.background = "rgba(11, 29, 38, 0.95)";
-      header.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.3)";
     } else {
       header.style.background = "rgba(11, 29, 38, 0.8)";
-      header.style.boxShadow = "none";
     }
+
+    lastScrollTop = scrollTop;
   });
 
-  // Slider navigation functionality
-  sliderNumbers.forEach((number, index) => {
-    number.addEventListener("click", function () {
-      // Remove active class from all numbers
-      sliderNumbers.forEach((n) => n.classList.remove("active"));
+  // Smooth scrolling para links de navegação
+  const navLinks = document.querySelectorAll(".nav a, .read-more");
 
-      // Add active class to clicked number
-      this.classList.add("active");
-
-      // Move slider indicator
-      const indicatorPosition = index * 60;
-      sliderIndicator.style.top = indicatorPosition + "px";
-
-      // Scroll to corresponding content section
-      const contentSections = document.querySelectorAll(".content-item");
-      if (contentSections[index]) {
-        contentSections[index].scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
-    });
-  });
-
-  // Scroll indicator functionality
-  scrollIndicator.addEventListener("click", function () {
-    const contentSection = document.querySelector(".content-section");
-    contentSection.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  });
-
-  // Navigation link active state
   navLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
-      // Remove active class from all links
-      navLinks.forEach((l) => l.classList.remove("active"));
+      e.preventDefault();
 
-      // Add active class to clicked link
-      this.classList.add("active");
-
-      // Smooth scroll to section
-      const targetId = this.getAttribute("href").substring(1);
-      const targetSection = document.getElementById(targetId);
-
-      if (targetSection) {
-        e.preventDefault();
-        targetSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    });
-  });
-
-  // Intersection Observer for content animations
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px",
-  };
-
-  const contentObserver = new IntersectionObserver(function (entries) {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = "1";
-        entry.target.style.transform = "translateY(0)";
-      }
-    });
-  }, observerOptions);
-
-  // Observe content items for animation
-  const contentItems = document.querySelectorAll(".content-item");
-  contentItems.forEach((item) => {
-    item.style.opacity = "0";
-    item.style.transform = "translateY(50px)";
-    item.style.transition = "opacity 0.8s ease, transform 0.8s ease";
-    contentObserver.observe(item);
-  });
-
-  // Parallax effect for hero background
-  window.addEventListener("scroll", function () {
-    const scrolled = window.pageYOffset;
-    const heroBg = document.querySelector(".hero-bg-image");
-
-    if (heroBg) {
-      const rate = scrolled * -0.5;
-      heroBg.style.transform = `translateY(${rate}px)`;
-    }
-  });
-
-  // Smooth reveal animation for content numbers
-  const numberObserver = new IntersectionObserver(
-    function (entries) {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const number = entry.target;
-          number.style.opacity = "0.3";
-          number.style.transform = "scale(1)";
-        }
-      });
-    },
-    { threshold: 0.5 }
-  );
-
-  const contentNumbers = document.querySelectorAll(".content-number");
-  contentNumbers.forEach((number) => {
-    number.style.opacity = "0";
-    number.style.transform = "scale(0.8)";
-    number.style.transition = "opacity 1s ease, transform 1s ease";
-    numberObserver.observe(number);
-  });
-
-  // Hover effects for social icons
-  const socialIcons = document.querySelectorAll(".social-icon");
-  socialIcons.forEach((icon) => {
-    icon.addEventListener("mouseenter", function () {
-      this.style.transform = "scale(1.1) rotate(5deg)";
-    });
-
-    icon.addEventListener("mouseleave", function () {
-      this.style.transform = "scale(1) rotate(0deg)";
-    });
-  });
-
-  // Account icon hover effect
-  const accountIcon = document.querySelector(".account-icon");
-  if (accountIcon) {
-    accountIcon.addEventListener("mouseenter", function () {
-      this.style.transform = "scale(1.1)";
-    });
-
-    accountIcon.addEventListener("mouseleave", function () {
-      this.style.transform = "scale(1)";
-    });
-  }
-
-  // Read more links hover effect
-  const readMoreLinks = document.querySelectorAll(".read-more");
-  readMoreLinks.forEach((link) => {
-    link.addEventListener("mouseenter", function () {
-      this.style.transform = "translateX(10px)";
-    });
-
-    link.addEventListener("mouseleave", function () {
-      this.style.transform = "translateX(0)";
-    });
-  });
-
-  // Smooth scroll for all internal links
-  const internalLinks = document.querySelectorAll('a[href^="#"]');
-  internalLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      const href = this.getAttribute("href");
-
-      if (href !== "#") {
-        e.preventDefault();
-        const targetElement = document.querySelector(href);
-
-        if (targetElement) {
+      const targetId = this.getAttribute("href");
+      if (targetId.startsWith("#")) {
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
           const headerHeight = header.offsetHeight;
-          const targetPosition = targetElement.offsetTop - headerHeight - 20;
+          const targetPosition = targetSection.offsetTop - headerHeight;
 
           window.scrollTo({
             top: targetPosition,
@@ -190,161 +39,298 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Add loading animation
-  window.addEventListener("load", function () {
-    document.body.classList.add("loaded");
-  });
-
-  // Mobile menu toggle (for smaller screens)
-  const createMobileMenu = () => {
-    if (window.innerWidth <= 768) {
-      const nav = document.querySelector(".nav");
-      const account = document.querySelector(".account");
-
-      if (nav && !document.querySelector(".mobile-menu-toggle")) {
-        const toggle = document.createElement("button");
-        toggle.className = "mobile-menu-toggle";
-        toggle.innerHTML = `
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                `;
-
-        toggle.addEventListener("click", function () {
-          nav.classList.toggle("active");
-          this.classList.toggle("active");
-        });
-
-        header.querySelector(".container").insertBefore(toggle, nav);
-
-        // Add mobile menu styles
-        const style = document.createElement("style");
-        style.textContent = `
-                    .mobile-menu-toggle {
-                        display: none;
-                        flex-direction: column;
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        padding: 5px;
-                    }
-                    
-                    .mobile-menu-toggle span {
-                        width: 25px;
-                        height: 3px;
-                        background: #FFFFFF;
-                        margin: 3px 0;
-                        transition: 0.3s;
-                    }
-                    
-                    .mobile-menu-toggle.active span:nth-child(1) {
-                        transform: rotate(-45deg) translate(-5px, 6px);
-                    }
-                    
-                    .mobile-menu-toggle.active span:nth-child(2) {
-                        opacity: 0;
-                    }
-                    
-                    .mobile-menu-toggle.active span:nth-child(3) {
-                        transform: rotate(45deg) translate(-5px, -6px);
-                    }
-                    
-                    @media (max-width: 768px) {
-                        .mobile-menu-toggle {
-                            display: flex;
-                        }
-                        
-                        .nav {
-                            display: none;
-                            width: 100%;
-                            text-align: center;
-                        }
-                        
-                        .nav.active {
-                            display: flex;
-                            flex-direction: column;
-                            gap: 15px;
-                        }
-                        
-                        .header .container {
-                            flex-wrap: wrap;
-                        }
-                    }
-                `;
-        document.head.appendChild(style);
-      }
-    }
+  // Animação de entrada para elementos quando aparecem na tela
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
   };
 
-  // Initialize mobile menu
-  createMobileMenu();
-  window.addEventListener("resize", createMobileMenu);
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1";
+        entry.target.style.transform = "translateY(0)";
+      }
+    });
+  }, observerOptions);
 
-  // Add scroll progress indicator
-  const createScrollProgress = () => {
-    if (!document.querySelector(".scroll-progress")) {
-      const progressBar = document.createElement("div");
-      progressBar.className = "scroll-progress";
-      progressBar.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 0%;
-                height: 3px;
-                background: linear-gradient(90deg, #FBD784, #FFFFFF);
-                z-index: 1001;
-                transition: width 0.1s ease;
-            `;
+  // Observar elementos de conteúdo
+  const contentItems = document.querySelectorAll(
+    ".content-item, .content-image"
+  );
+  contentItems.forEach((item) => {
+    item.style.opacity = "0";
+    item.style.transform = "translateY(30px)";
+    item.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+    observer.observe(item);
+  });
 
-      document.body.appendChild(progressBar);
+  // Parallax effect para backgrounds do hero
+  window.addEventListener("scroll", function () {
+    const scrolled = window.pageYOffset;
+    const heroBgs = document.querySelectorAll(".hero-bg");
 
-      window.addEventListener("scroll", function () {
-        const scrolled =
-          (window.pageYOffset /
-            (document.documentElement.scrollHeight - window.innerHeight)) *
-          100;
-        progressBar.style.width = scrolled + "%";
+    heroBgs.forEach((bg, index) => {
+      const speed = (index + 1) * 0.5;
+      const yPos = -(scrolled * speed);
+      bg.style.transform = `translateY(${yPos}px)`;
+    });
+  });
+
+  // Navegação do slider
+  const sliderIndicator = document.querySelector(".slider-indicator");
+  const sliderTexts = document.querySelectorAll(".slider-text span");
+  let currentSlide = 0;
+
+  function updateSlider() {
+    const indicatorHeight = 60;
+    const totalHeight = 240;
+    const slideHeight = totalHeight / (sliderTexts.length - 1);
+
+    sliderIndicator.style.top = `${currentSlide * slideHeight}px`;
+
+    // Atualizar texto ativo
+    sliderTexts.forEach((text, index) => {
+      if (index === currentSlide) {
+        text.style.color = "#FBD784";
+        text.style.fontWeight = "800";
+      } else {
+        text.style.color = "#ffffff";
+        text.style.fontWeight = "700";
+      }
+    });
+  }
+
+  // Navegação por clique nos números do slider
+  sliderTexts.forEach((text, index) => {
+    text.addEventListener("click", function () {
+      currentSlide = index;
+      updateSlider();
+
+      // Scroll para a seção correspondente
+      const contentSections = document.querySelectorAll(".content-grid");
+      if (contentSections[index]) {
+        const headerHeight = header.offsetHeight;
+        const targetPosition = contentSections[index].offsetTop - headerHeight;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: "smooth",
+        });
+      }
+    });
+  });
+
+  // Atualizar slider baseado no scroll
+  window.addEventListener("scroll", function () {
+    const scrollTop = window.pageYOffset;
+    const contentSections = document.querySelectorAll(".content-grid");
+
+    contentSections.forEach((section, index) => {
+      const sectionTop = section.offsetTop - header.offsetHeight;
+      const sectionBottom = sectionTop + section.offsetHeight;
+
+      if (scrollTop >= sectionTop && scrollTop < sectionBottom) {
+        currentSlide = index;
+        updateSlider();
+      }
+    });
+  });
+
+  // Inicializar slider
+  updateSlider();
+
+  // Hover effects para ícones sociais
+  const socialIcons = document.querySelectorAll(".social-icon");
+
+  socialIcons.forEach((icon) => {
+    icon.addEventListener("mouseenter", function () {
+      this.style.transform = "scale(1.2) rotate(5deg)";
+    });
+
+    icon.addEventListener("mouseleave", function () {
+      this.style.transform = "scale(1) rotate(0deg)";
+    });
+  });
+
+  // Animação de contador para números grandes
+  function animateCounter(element, target, duration = 2000) {
+    let start = 0;
+    const increment = target / (duration / 16);
+
+    function updateCounter() {
+      start += increment;
+      if (start < target) {
+        element.textContent = Math.floor(start);
+        requestAnimationFrame(updateCounter);
+      } else {
+        element.textContent = target;
+      }
+    }
+
+    updateCounter();
+  }
+
+  // Observar números para animação
+  const numberObserver = new IntersectionObserver(
+    function (entries) {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const number = entry.target;
+          const targetNumber = parseInt(number.textContent);
+          animateCounter(number, targetNumber);
+          numberObserver.unobserve(number);
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  // Observar números de conteúdo
+  const contentNumbers = document.querySelectorAll(".content-number");
+  contentNumbers.forEach((number) => {
+    numberObserver.observe(number);
+  });
+
+  // Efeito de parallax para imagens de conteúdo
+  const contentImages = document.querySelectorAll(".content-image");
+
+  window.addEventListener("scroll", function () {
+    const scrolled = window.pageYOffset;
+
+    contentImages.forEach((image, index) => {
+      const speed = 0.3 + index * 0.1;
+      const yPos = -(scrolled * speed);
+      image.style.transform = `translateY(${yPos}px)`;
+    });
+  });
+
+  // Smooth reveal para elementos quando aparecem
+  const revealElements = document.querySelectorAll(
+    ".content-item h2, .content-item h3, .content-item p"
+  );
+
+  revealElements.forEach((element, index) => {
+    element.style.opacity = "0";
+    element.style.transform = "translateX(-30px)";
+    element.style.transition = `opacity 0.6s ease ${
+      index * 0.1
+    }s, transform 0.6s ease ${index * 0.1}s`;
+
+    const elementObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateX(0)";
+            elementObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    elementObserver.observe(element);
+  });
+
+  // Efeito de hover para botões "read more"
+  const readMoreLinks = document.querySelectorAll(".read-more");
+
+  readMoreLinks.forEach((link) => {
+    link.addEventListener("mouseenter", function () {
+      this.style.transform = "translateX(10px)";
+    });
+
+    link.addEventListener("mouseleave", function () {
+      this.style.transform = "translateX(0)";
+    });
+  });
+
+  // Navegação por teclado
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown" || e.key === "PageDown") {
+      e.preventDefault();
+      const currentSection = getCurrentSection();
+      if (currentSection < contentSections.length - 1) {
+        scrollToSection(currentSection + 1);
+      }
+    } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+      e.preventDefault();
+      const currentSection = getCurrentSection();
+      if (currentSection > 0) {
+        scrollToSection(currentSection - 1);
+      }
+    }
+  });
+
+  function getCurrentSection() {
+    const scrollTop = window.pageYOffset;
+    const contentSections = document.querySelectorAll(".content-grid");
+
+    for (let i = 0; i < contentSections.length; i++) {
+      const sectionTop = contentSections[i].offsetTop - header.offsetHeight;
+      const sectionBottom = sectionTop + contentSections[i].offsetHeight;
+
+      if (scrollTop >= sectionTop && scrollTop < sectionBottom) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  function scrollToSection(sectionIndex) {
+    const contentSections = document.querySelectorAll(".content-grid");
+    if (contentSections[sectionIndex]) {
+      const headerHeight = header.offsetHeight;
+      const targetPosition =
+        contentSections[sectionIndex].offsetTop - headerHeight;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
       });
     }
-  };
+  }
 
-  createScrollProgress();
-
-  // Add keyboard navigation support
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "ArrowDown" && window.pageYOffset < 100) {
-      e.preventDefault();
-      scrollIndicator.click();
-    }
-
-    if (e.key === "Escape") {
-      const mobileMenu = document.querySelector(".nav.active");
-      if (mobileMenu) {
-        mobileMenu.classList.remove("active");
-        document
-          .querySelector(".mobile-menu-toggle")
-          ?.classList.remove("active");
-      }
+  // Preloader (opcional)
+  window.addEventListener("load", function () {
+    const preloader = document.querySelector(".preloader");
+    if (preloader) {
+      preloader.style.opacity = "0";
+      setTimeout(() => {
+        preloader.style.display = "none";
+      }, 500);
     }
   });
 
-  // Performance optimization: Throttle scroll events
-  let ticking = false;
+  // Adicionar classe ativa ao link de navegação atual
+  function updateActiveNavLink() {
+    const scrollTop = window.pageYOffset;
+    const sections = document.querySelectorAll("section[id]");
 
-  function updateOnScroll() {
-    // Update scroll-based animations here
-    ticking = false;
+    sections.forEach((section) => {
+      const sectionTop = section.offsetTop - header.offsetHeight - 100;
+      const sectionBottom = sectionTop + section.offsetHeight;
+      const sectionId = section.getAttribute("id");
+      const navLink = document.querySelector(`.nav a[href="#${sectionId}"]`);
+
+      if (scrollTop >= sectionTop && scrollTop < sectionBottom && navLink) {
+        document
+          .querySelectorAll(".nav a")
+          .forEach((link) => link.classList.remove("active"));
+        navLink.classList.add("active");
+      }
+    });
   }
 
-  function requestTick() {
-    if (!ticking) {
-      requestAnimationFrame(updateOnScroll);
-      ticking = true;
-    }
-  }
+  window.addEventListener("scroll", updateActiveNavLink);
 
-  window.addEventListener("scroll", requestTick);
-
-  console.log("MNTN Website loaded successfully! 🏔️");
+  // Console log para debug
+  console.log("MNTN - Site de Montanhismo carregado com sucesso!");
+  console.log("Funcionalidades disponíveis:");
+  console.log("- Navegação suave");
+  console.log("- Efeitos de parallax");
+  console.log("- Animações de entrada");
+  console.log("- Navegação por slider");
+  console.log("- Navegação por teclado (setas)");
 });
-

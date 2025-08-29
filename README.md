@@ -1,109 +1,94 @@
-# 🏔️ MNTN - Website de Montanhismo
+# MNTN - Site de Montanhismo
 
-Um site moderno e responsivo inspirado no design do Figma para a marca MNTN, especializada em guias de montanhismo e aventuras ao ar livre.
+Um site moderno e responsivo para uma empresa de montanhismo, criado com base no design do Figma.
 
-## ✨ Características
+## 🏔️ Sobre o Projeto
+
+O MNTN é um site elegante e minimalista que apresenta informações sobre montanhismo, equipamentos e dicas para iniciantes. O design foi inspirado em layouts modernos com foco na experiência do usuário.
+
+## ✨ Funcionalidades
 
 - **Design Responsivo**: Adapta-se perfeitamente a todos os dispositivos
-- **Animações Suaves**: Transições e efeitos visuais elegantes
-- **Navegação Intuitiva**: Slider lateral e navegação por seções
-- **Performance Otimizada**: Código limpo e eficiente
-- **Acessibilidade**: Suporte a navegação por teclado e leitores de tela
+- **Navegação Suave**: Scroll suave entre seções
+- **Efeitos de Parallax**: Backgrounds com movimento durante o scroll
+- **Animações de Entrada**: Elementos aparecem com animações elegantes
+- **Slider de Navegação**: Navegação lateral com indicador visual
+- **Links Sociais**: Integração com Instagram e Twitter
+- **Navegação por Teclado**: Suporte para navegação com setas do teclado
 
-## 🚀 Como Executar
+## 🛠️ Tecnologias Utilizadas
 
-### Opção 1: Abrir Diretamente
+- **HTML5**: Estrutura semântica e acessível
+- **CSS3**: Estilos modernos com Flexbox e Grid
+- **JavaScript Vanilla**: Funcionalidades interativas sem dependências
+- **Fontes Google**: Inter e Chronicle Display para tipografia
+- **SVG**: Ícones vetoriais escaláveis
 
-1. Baixe todos os arquivos para uma pasta
-2. Abra o arquivo `index.html` em seu navegador
+## 🎨 Paleta de Cores
 
-### Opção 2: Servidor Local (Recomendado)
-
-1. Instale o [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) no VS Code
-2. Clique com o botão direito no `index.html`
-3. Selecione "Open with Live Server"
-
-### Opção 3: Python
-
-```bash
-# Python 3
-python -m http.server 8000
-
-# Python 2
-python -m SimpleHTTPServer 8000
-```
-
-Depois acesse `http://localhost:8000`
-
-## 📁 Estrutura dos Arquivos
-
-```
-mntn-website/
-├── index.html          # Estrutura HTML principal
-├── styles.css          # Estilos CSS completos
-├── script.js           # Funcionalidades JavaScript
-└── README.md           # Este arquivo
-```
-
-## 🎨 Componentes Principais
-
-### Header
-
-- Logo MNTN animado
-- Menu de navegação responsivo
-- Ícone de conta com efeitos hover
-
-### Hero Section
-
-- Título principal impactante
-- Badge "A Hiking guide"
-- Indicador de scroll interativo
-- Links para redes sociais
-- Navegação por slider lateral
-
-### Seções de Conteúdo
-
-- Layout alternado (esquerda/direita)
-- Números grandes decorativos
-- Imagens placeholder
-- Links "read more" com animações
-
-### Footer
-
-- Informações da empresa
-- Links úteis organizados
-- Logo MNTN
-
-## 🎯 Funcionalidades JavaScript
-
-- **Navegação por Slider**: Clique nos números para navegar entre seções
-- **Scroll Suave**: Navegação interna com animações
-- **Efeitos de Hover**: Interações visuais em elementos clicáveis
-- **Menu Mobile**: Navegação adaptada para dispositivos móveis
-- **Barra de Progresso**: Indicador visual de progresso do scroll
-- **Animações de Entrada**: Elementos aparecem conforme o scroll
-- **Efeito Parallax**: Background com movimento durante o scroll
+- **Primária**: #0B1D26 (Azul escuro)
+- **Secundária**: #FBD784 (Dourado)
+- **Texto**: #FFFFFF (Branco)
+- **Transparências**: Várias opacidades para efeitos visuais
 
 ## 📱 Responsividade
 
 O site é totalmente responsivo e funciona perfeitamente em:
 
 - Desktop (1920px+)
-- Tablet (768px - 1199px)
-- Mobile (320px - 767px)
+- Tablet (768px - 1024px)
+- Mobile (320px - 768px)
 
-## 🎨 Paleta de Cores
+## 🚀 Como Executar
 
-- **Primária**: `#0B1D26` (Azul escuro)
-- **Secundária**: `#FBD784` (Dourado)
-- **Texto**: `#FFFFFF` (Branco)
-- **Gradientes**: Variações de azul para backgrounds
+1. Clone ou baixe os arquivos do projeto
+2. Abra o arquivo `index.html` em qualquer navegador moderno
+3. Ou use um servidor local para melhor experiência
+
+### Servidor Local (Recomendado)
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Node.js
+npx serve .
+
+# PHP
+php -S localhost:8000
+```
+
+## 📁 Estrutura do Projeto
+
+```
+mntn-site/
+├── index.html          # Arquivo principal HTML
+├── styles.css          # Estilos CSS
+├── script.js           # Funcionalidades JavaScript
+└── README.md           # Este arquivo
+```
+
+## 🎯 Seções do Site
+
+1. **Header**: Navegação principal com logo MNTN
+2. **Hero**: Seção principal com título e subtítulo
+3. **Equipment**: Primeira seção de conteúdo sobre níveis de montanhismo
+4. **About**: Segunda seção sobre equipamentos essenciais
+5. **Blog**: Terceira seção sobre mapas e navegação
+
+## 🎭 Animações e Efeitos
+
+- **Fade In**: Elementos aparecem gradualmente
+- **Slide Up**: Movimento de baixo para cima
+- **Parallax**: Backgrounds se movem em velocidades diferentes
+- **Hover Effects**: Interações ao passar o mouse
+- **Smooth Scrolling**: Navegação suave entre seções
 
 ## 🔧 Personalização
 
-### Alterar Cores
+### Cores
 
-Edite as variáveis CSS no arquivo `styles.css`:
+Para alterar as cores, edite as variáveis CSS no arquivo `styles.css`:
 
 ```css
 :root {
@@ -113,47 +98,39 @@ Edite as variáveis CSS no arquivo `styles.css`:
 }
 ```
 
-### Adicionar Conteúdo
+### Conteúdo
 
-Para adicionar novas seções, siga o padrão:
+Para alterar o conteúdo, edite o arquivo `index.html` nas seções correspondentes.
 
-```html
-<div class="content-item">
-  <div class="content-number">04</div>
-  <div class="content-info">
-    <h3>Seu Título</h3>
-    <p>Descrição</p>
-    <a href="#" class="read-more">read more</a>
-  </div>
-  <div class="content-image">
-    <div class="image-placeholder"></div>
-  </div>
-</div>
-```
+### Animações
 
-## 🌐 Navegadores Suportados
+Para ajustar as animações, modifique os valores no arquivo `script.js`.
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+## 🌐 Compatibilidade
+
+- Chrome 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
+- Mobile browsers modernos
 
 ## 📝 Licença
 
-Este projeto foi criado para fins educacionais e de demonstração. Sinta-se livre para usar e modificar conforme suas necessidades.
+Este projeto foi criado para fins educacionais e de demonstração.
 
 ## 🤝 Contribuições
 
-Contribuições são bem-vindas! Sinta-se à vontade para:
+Sugestões e melhorias são sempre bem-vindas! Sinta-se à vontade para:
 
 - Reportar bugs
-- Sugerir melhorias
-- Enviar pull requests
+- Sugerir novas funcionalidades
+- Melhorar a documentação
+- Otimizar o código
 
-## 📞 Suporte
+## 📞 Contato
 
-Se você tiver alguma dúvida ou problema, abra uma issue no repositório ou entre em contato.
+Para dúvidas ou sugestões sobre este projeto, entre em contato através dos canais disponíveis.
 
 ---
 
-**Desenvolvido com ❤️ para a comunidade de montanhismo** 🏔️
+**MNTN** - Prepare-se para as montanhas e além! 🏔️

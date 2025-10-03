@@ -101,32 +101,28 @@ class HuggingFaceService:
     def _create_medical_prompt(
         self, age: str, weight: str, clinical_history: str
     ) -> str:
-        """Create a comprehensive prompt for medical analysis."""
+        """Create a comprehensive and direct prompt for medical analysis."""
         
         prompt = f"""
-        Por favor, analise a imagem médica fornecida e gere um relatório médico completo em português do Brasil.
+        SYSTEM: Você é um cardiologista experiente. Sua tarefa é analisar a imagem de Eletrocardiograma (ECG) fornecida e gerar um laudo médico detalhado e objetivo.
+        **DADOS DO PACIENTE:**
+        - **Idade:** {age} anos
+        - **Peso:** {weight} kg
+        - **Histórico Clínico:** {clinical_history}
 
-        INFORMAÇÕES DO PACIENTE:
-        - Idade: {age} anos
-        - Peso: {weight} kg
-        - Histórico Clínico: {clinical_history}
+       **TAREFA:**
+        Baseado exclusivamente na imagem do ECG e no histórico clínico, elabore o laudo médico. O laudo deve ser estruturado e conter as seguintes seções obrigatórias com suas respectivas análises:
 
-        INSTRUÇÕES PARA ANÁLISE:
-        1. Avalie a qualidade técnica da imagem
-        2. Identifique as estruturas anatômicas visíveis
-        3. Detecte possíveis achados patológicos ou anormalidades
-        4. Correlacione os achados com o histórico clínico fornecido
-        5. Forneça uma impressão diagnóstica fundamentada
-        6. Sugira recomendações para investigação adicional se necessário
+        1.  **Análise do Traçado e Calibração:** (Avalie a qualidade técnica da imagem).
+        2.  **Ritmo e Frequência Cardíaca (FC):** (Identifique o ritmo e calcule a FC).
+        3.  **Análise de Intervalos:** (Calcule e avalie os valores de PR, QRS, QT e QTc).
+        4.  **Eixo Elétrico:** (Determine o eixo elétrico).
+        5.  **Análise Morfológica:** (Descreva a morfologia da onda P, complexo QRS, segmento ST e onda T).
+        6.  **Arritmias e Distúrbios de Condução:** (Identifique quaisquer anormalidades).
+        7.  **Conclusão e Impressão Diagnóstica:** (Sintetize os achados em uma conclusão clara).
+        8.  **Recomendações:** (Sugira os próximos passos ou exames, se necessário).
 
-        FORMATO DO RELATÓRIO:
-        - Use linguagem médica profissional
-        - Seja objetivo e preciso
-        - Inclua todas as seções relevantes
-        - Mencione limitações da análise por imagem
-        - Enfatize a necessidade de correlação clínica
-
-        Por favor, gere um relatório médico estruturado e profissional:
+        Gere apenas o texto do laudo, seguindo estritamente as seções acima.
         """
         
         return prompt.strip()

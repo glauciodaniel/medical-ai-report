@@ -27,7 +27,7 @@ try:
     print(f"📊 Top P: {TOP_P}")
     
     # Verificar se é a URL padrão ou customizada
-    if MEDGEMMA_MODEL_URL == "https://r2y80g16msuhn4pg.us-east-1.aws.endpoints.huggingface.cloud":
+    if MEDGEMMA_MODEL_URL == "https://u9yyy2quq9hdyqbu.us-east-1.aws.endpoints.huggingface.cloud":
         print(f"📋 Modelo: {MEDGEMMA_MODEL_URL} (padrão)")
     else:
         print(f"📋 Modelo: {MEDGEMMA_MODEL_URL} (customizado)")

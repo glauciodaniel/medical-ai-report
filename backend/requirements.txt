@@ -11,6 +11,7 @@ Pillow
 
 # HTTP requests
 requests==2.31.0
+httpx==0.25.2
 
 # Hugging Face transformers (optional - for local model inference)
 transformers==4.36.0

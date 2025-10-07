@@ -16,7 +16,7 @@ def test_custom_endpoint():
     
     # Get configuration
     token = os.getenv("HUGGINGFACE_API_TOKEN")
-    model_url = os.getenv("MEDGEMMA_MODEL_URL", "https://r2y80g16msuhn4pg.us-east-1.aws.endpoints.huggingface.cloud")
+    model_url = os.getenv("MEDGEMMA_MODEL_URL", "https://u9yyy2quq9hdyqbu.us-east-1.aws.endpoints.huggingface.cloud")
     
     print("🧪 TESTANDO ENDPOINT PERSONALIZADO DO HUGGING FACE")
     print("=" * 60)
@@ -134,7 +134,7 @@ def test_endpoint_info():
     print("\n🔍 INFORMAÇÕES DO ENDPOINT")
     print("=" * 40)
     
-    model_url = os.getenv("MEDGEMMA_MODEL_URL", "https://r2y80g16msuhn4pg.us-east-1.aws.endpoints.huggingface.cloud")
+    model_url = os.getenv("MEDGEMMA_MODEL_URL", "https://u9yyy2quq9hdyqbu.us-east-1.aws.endpoints.huggingface.cloud")
     
     # Parse URL
     if "us-east-1.aws.endpoints.huggingface.cloud" in model_url:

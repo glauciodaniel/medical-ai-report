@@ -12,6 +12,7 @@ from typing import Optional
 # Import configuration
 from config import (
     HUGGINGFACE_API_TOKEN,
+    MEDGEMMA_MODEL_URL,
     API_HOST,
     API_PORT,
     CORS_ORIGINS
@@ -29,8 +30,12 @@ try:
     
     # Decide qual serviço instanciar com base no token da API
     if HUGGINGFACE_API_TOKEN:
-        ai_service = HuggingFaceService(api_token=HUGGINGFACE_API_TOKEN)
+        ai_service = HuggingFaceService(
+            api_token=HUGGINGFACE_API_TOKEN,
+            model_url=MEDGEMMA_MODEL_URL
+        )
         print("✅ Real Hugging Face service initialized.")
+        print(f"🔗 Primary endpoint: {MEDGEMMA_MODEL_URL}")
     else:
         ai_service = DemoHuggingFaceService()
         print("⚠️  Hugging Face token not found. Initializing in DEMO mode.")
@@ -92,7 +97,7 @@ async def health_check():
     """Health check endpoint to verify dependencies and API status."""
     service_status = {}
     if ai_service and hasattr(ai_service, 'check_api_status'):
-        service_status = ai_service.check_api_status()
+        service_status = await ai_service.check_api_status()
     elif SERVICE_INITIALIZATION_ERROR:
         service_status = {"status": "error", "message": SERVICE_INITIALIZATION_ERROR}
 

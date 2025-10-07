@@ -6,7 +6,7 @@ load_dotenv()
 
 # Hugging Face API Configuration
 HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN")
-MEDGEMMA_MODEL_URL = os.getenv("MEDGEMMA_MODEL_URL", "https://r2y80g16msuhn4pg.us-east-1.aws.endpoints.huggingface.cloud")
+MEDGEMMA_MODEL_URL = os.getenv("MEDGEMMA_MODEL_URL", "https://u9yyy2quq9hdyqbu.us-east-1.aws.endpoints.huggingface.cloud")
 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

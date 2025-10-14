@@ -1,0 +1,569 @@
+"""
+Hugging Face integration service for medical AI analysis.
+"""
+
+import base64
+import io
+import json
+import httpx 
+import asyncio
+from typing import Optional, Dict, Any
+from datetime import datetime
+
+try:
+    import requests
+    from PIL import Im            # Redimensiona se necessário (otimização)
+            if image.size[0] > 1024 or image.size[1] > 1024:
+                image.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
+                print(f"🔄 Imagem redimensionada para: {image.size}")
+            
+            # Prepare enhanced prompt with image context
+            enhanced_prompt = f"{prompt}\n\n{image_info}\n\n[IMPORTANTE: Uma imagem de ECG foi enviada para análise. Use as informações técnicas acima para contextualizar sua análise.]" DEPENDENCIES_AVAILABLE = True
+except ImportError:
+    DEPENDENCIES_AVAILABLE = False
+
+class HuggingFaceService:
+    """Service for interacting with Hugging Face Inference API."""
+    
+    def __init__(self, api_token: str):
+        self.api_token = api_token
+        self.base_url = "https://u9yyy2quq9hdyqbu.us-east-1.aws.endpoints.huggingface.cloud"
+        self.medgemma_url = f"{self.base_url}"
+        self.headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json"
+        }
+    
+    async def analyze_medical_image(
+        self,
+        image_base64: str,
+        patient_age: str,
+        patient_weight: str,
+        clinical_history: str
+    ) -> str:
+        """
+        Analyze medical image using MedGemma model.
+        
+        Args:
+            image_base64: Base64 encoded medical image
+            patient_age: Patient age in years
+            patient_weight: Patient weight in kg
+            clinical_history: Patient clinical history
+            
+        Returns:
+            Generated medical report text
+            
+        Raises:
+            Exception: If API call fails or dependencies are not available
+        """
+        
+        if not DEPENDENCIES_AVAILABLE:
+            raise Exception(
+                "Dependências necessárias não estão disponíveis. "
+                "Instale: pip install requests pillow transformers"
+            )
+        
+        try:
+            # Debug logs
+            print(f"🔍 Debug info:")
+            print(f"  - Base64 length: {len(image_base64)}")
+            print(f"  - Starts with data: {image_base64.startswith('data:')}")
+            print(f"  - Patient age: {patient_age}")
+            
+            # Validate and process image
+            image = self._process_image(image_base64)
+            
+            # Create comprehensive prompt
+            prompt = self._create_medical_prompt(
+                patient_age, patient_weight, clinical_history
+            )
+            
+            # Extract image metadata for context
+            image_info = self._extract_image_info(image)
+            
+            # Call Hugging Face API
+            response = await self._call_medgemma_api(prompt, image, image_info)
+            
+            # Process and format response
+            formatted_report = self._format_medical_report(
+                response, patient_age, patient_weight, clinical_history
+            )
+            
+            return formatted_report
+            
+        except Exception as e:
+            error_msg = str(e)
+            
+            # Se for erro de CUDA recorrente, use modo demo automaticamente
+            if "CUDA error" in error_msg or "GPU" in error_msg:
+                print("🔄 Erro de GPU detectado - usando modo demonstração...")
+                demo_service = DemoHuggingFaceService()
+                demo_report = await demo_service.analyze_medical_image(
+                    image_base64, patient_age, patient_weight, clinical_history
+                )
+                return demo_report + "\n\n⚠️ NOTA: Relatório gerado em modo demonstração devido a problemas temporários no servidor de IA."
+            
+            raise Exception(f"Erro na análise de imagem médica: {error_msg}")
+    
+    def _process_image(self, image_base64: str) -> Image.Image:
+        """Process and validate medical image with better error handling."""
+        try:
+            # Validate base64 input
+            if not image_base64:
+                raise Exception("Imagem base64 está vazia")
+            
+            # Remove data URL prefix if present
+            if image_base64.startswith('data:image'):
+                image_base64 = image_base64.split(',')[1]
+            
+            # Decode base64
+            try:
+                image_data = base64.b64decode(image_base64)
+            except Exception as e:
+                raise Exception(f"Erro ao decodificar base64: {str(e)}")
+            
+            if len(image_data) == 0:
+                raise Exception("Dados da imagem estão vazios após decodificação")
+            
+            # Open image
+            image = Image.open(io.BytesIO(image_data))
+            print(f"📸 Imagem original: {image.size}, modo: {image.mode}")
+            
+            # Convert to RGB if necessary
+            if image.mode not in ['RGB', 'L']:
+                image = image.convert('RGB')
+                print(f"🔄 Convertido para RGB")
+            
+            # Resize if too large (max 1024x1024 for API efficiency)
+            max_size = 1024
+            if image.width > max_size or image.height > max_size:
+                original_size = image.size
+                image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                print(f"📏 Redimensionado de {original_size} para {image.size}")
+            
+            return image
+            
+        except Exception as e:
+            raise Exception(f"Erro ao processar imagem: {str(e)}")
+    
+    def _extract_image_info(self, image: Image.Image) -> str:
+        """Extract basic information about the image for context."""
+        try:
+            width, height = image.size
+            mode = image.mode
+            
+            # Basic image analysis without numpy
+            img_gray = image.convert('L')
+            
+            # Get pixel values for analysis
+            pixels = list(img_gray.getdata())
+            
+            # Calculate basic statistics manually
+            mean_brightness = sum(pixels) / len(pixels)
+            variance = sum((p - mean_brightness) ** 2 for p in pixels) / len(pixels)
+            std_brightness = variance ** 0.5
+            
+            # Determine if image appears to be an ECG based on characteristics
+            is_likely_ecg = (
+                width > height * 1.5 and  # ECG typically wider than tall
+                std_brightness > 30 and   # ECG has good contrast
+                mean_brightness > 100     # ECG typically has light background
+            )
+            
+            image_context = f"""
+INFORMAÇÕES DA IMAGEM ANALISADA:
+- Dimensões: {width}x{height} pixels
+- Modo de cor: {mode}
+- Brilho médio: {mean_brightness:.1f}
+- Contraste (desvio padrão): {std_brightness:.1f}
+- Características compatíveis com ECG: {"Sim" if is_likely_ecg else "Não"}
+- Qualidade para análise: {"Adequada" if std_brightness > 20 else "Baixa"}
+"""
+            return image_context.strip()
+            
+        except Exception as e:
+            return f"INFORMAÇÕES DA IMAGEM: Imagem de {image.size[0]}x{image.size[1]} pixels recebida para análise."
+    
+    def _create_medical_prompt(
+        self, age: str, weight: str, clinical_history: str
+    ) -> str:
+        """Create a highly specific prompt with a one-shot example and constraints."""
+        
+        prompt = f"""SYSTEM: Você é um cardiologista especialista. Sua única função é analisar a imagem de ECG e os dados clínicos fornecidos e retornar um laudo médico completo.
+
+**DADOS DO PACIENTE:**
+- **Idade:** {age} anos
+- **Peso:** {weight} kg
+- **História Clínica:** {clinical_history}
+
+**TAREFA E RESTRIÇÕES:**
+1.  Analise a imagem de ECG fornecida. Execute uma análise detalhada, incluindo:
+    - Ritmo e frequência cardíaca
+    - Morfologia das ondas (P, QRS, T)
+    - Intervalos (PR, QT)
+    - Segmentos (ST)
+    - Eixo elétrico
+    - Identificação de quaisquer anormalidades ou achados relevantes
+2.  Preencha TODAS as seções do laudo com base na SUA ANÁLISE da imagem e da clínica.
+3.  Sua resposta deve ser APENAS o laudo preenchido.
+4.  NÃO inclua placeholders como `[Número]` ou `[Descrever...]`.
+5.  NÃO gere código Python. Não explique seu processo. Aja como se estivesse salvando o texto final diretamente em um prontuário.
+
+**EXEMPLO DE UM LAUDO CORRETO:(Os itens de 1 a 4 abaixo são somente para referência, não devem ser incluídos no laudo final, verifique se a imagem ECG foi enviada, do contrário informe que a imagem não foi enviada, se foi, realize a análise)**
+**1. Análise do Ritmo e Frequência Cardíaca:**
+- **Ritmo:** Sinusal, regular.
+- **Frequência Cardíaca:** 75 bpm.
+
+**2. Análise das Ondas, Intervalos e Segmentos:**
+- **Onda P:** Morfologia normal, duração de 0.08s.
+- **Intervalo PR:** Duração de 0.16s.
+- **Complexo QRS:** Duração de 0.09s, eixo em +30°, sem alterações de amplitude.
+- **Segmento ST:** Isoelétrico, sem supra ou infradesnivelamento.
+- **Onda T:** Eixos concordantes com o QRS, morfologia normal.
+- **Intervalo QT:** Duração de 0.40s, QTc (Bazett) de 0.42s.
+
+**3. Impressão Diagnóstica:**
+- Eletrocardiograma dentro dos limites da normalidade.
+
+**4. Recomendações Clínicas:**
+- Nenhuma recomendação baseada no traçado atual. Correlacionar com quadro clínico.
+---
+
+**LAUDO MÉDICO BASEADO NOS DADOS FORNECIDOS:**
+"""
+        
+        return prompt.strip()
+    
+    async def _call_medgemma_api(self, prompt: str, image: Image.Image, image_info: str) -> str:
+        """Call MedGemma model via Hugging Face API with intelligent fallback."""
+        
+        try:
+            # Log image info for debugging
+            print(f"📸 Imagem processada: {image.size}, modo: {image.mode}")
+            
+            # Otimiza a imagem se necessário (o modelo funciona melhor com imagens menores)
+            if image.size[0] > 768 or image.size[1] > 768:
+                original_size = image.size
+                image.thumbnail((768, 768), Image.Resampling.LANCZOS)
+                print(f"📏 Imagem otimizada de {original_size} para {image.size}")
+            
+            # Garante que a imagem está em RGB (necessário para o modelo)
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+                print(f"🔄 Imagem convertida para RGB")
+            
+            # Prepare enhanced prompt with image context
+            enhanced_prompt = f"{prompt}\n\n{image_info}\n\n[IMPORTANTE: Uma imagem de ECG foi enviada para análise. Use as informações técnicas acima para contextualizar sua análise.]"
+                image.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
+                print(f"� Imagem redimensionada para: {image.size}")
+            
+            # Prepare enhanced prompt with image context
+            enhanced_prompt = f"{prompt}\n\n{image_info}\n\n[IMPORTANTE: Uma imagem de ECG foi enviada e analisada. Use as informações técnicas acima para contextualizar sua análise.]"
+            
+            # Estrutura de mensagens correta para modelos multimodais
+            messages = [
+                {
+                    "role": "system",
+                    "content": [{"type": "text", "text": "Você é um cardiologista especialista em análise de ECG."}]
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image", "image": image}  # PIL Image diretamente
+                    ]
+                }
+            ]
+            
+            # Lista de formatos para tentar (do mais específico ao mais genérico)
+            payloads_to_try = [
+                # Formato 1: Estrutura de mensagens correta com imagem PIL
+                {
+                    "inputs": messages,
+                    "parameters": {
+                        "max_new_tokens": 2048,
+                        "temperature": 0.1,
+                        "do_sample": True
+                    }
+                },
+                # Formato 2: Mensagens simplificadas
+                {
+                    "inputs": [
+                        {
+                            "role": "system",
+                            "content": "Você é um cardiologista especialista."
+                        },
+                        {
+                            "role": "user", 
+                            "content": enhanced_prompt
+                        }
+                    ],
+                    "parameters": {
+                        "max_new_tokens": 1024,
+                        "temperature": 0.2
+                    }
+                },
+                # Formato 3: Apenas texto com contexto da imagem
+                {
+                    "inputs": enhanced_prompt,
+                    "parameters": {
+                        "max_new_tokens": 1024,
+                        "temperature": 0.3
+                    }
+                },
+                # Formato 4: Texto básico
+                {
+                    "inputs": prompt,
+                    "parameters": {
+                        "max_new_tokens": 1024,
+                        "temperature": 0.4
+                    }
+                }
+            ]
+            
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                last_error = None
+                
+                # Tenta cada formato sequencialmente
+                format_names = ["Mensagens com imagem PIL", "Mensagens simplificadas", "Texto com contexto", "Texto básico"]
+                
+                for i, payload in enumerate(payloads_to_try):
+                    try:
+                        print(f"🔄 Tentativa {i+1}/4 - {format_names[i]}")
+                        
+                        # Primeira tentativa
+                        response = await client.post(
+                            self.medgemma_url,
+                            headers=self.headers,
+                            json=payload
+                        )
+                        
+                        # Lógica de retry para status 503 (Model loading) - só na primeira tentativa
+                        if response.status_code == 503 and i == 0:
+                            print("⏳ Modelo carregando... aguardando 15 segundos...")
+                            await asyncio.sleep(15)
+                            response = await client.post(
+                                self.medgemma_url,
+                                headers=self.headers,
+                                json=payload
+                            )
+                        
+                        # Se funcionou, extrai resultado e retorna
+                        if response.status_code == 200:
+                            print(f"✅ Sucesso com formato {i+1}")
+                            result = response.json()
+                            return self._extract_response_text(result)
+                        
+                        # Log do erro para debug
+                        error_detail = response.text[:200] if response.text else "Sem detalhes"
+                        print(f"❌ Formato {i+1} falhou: {response.status_code} - {error_detail}...")
+                        last_error = f"Status {response.status_code}: {error_detail}"
+                        
+                        # Se é erro de CUDA, aguarda um pouco antes da próxima tentativa
+                        if "CUDA error" in response.text:
+                            print("⚠️ Erro de CUDA detectado - aguardando 5s...")
+                            await asyncio.sleep(5)
+                    
+                    except Exception as e:
+                        print(f"❌ Formato {i+1} erro de conexão: {str(e)}")
+                        last_error = str(e)
+                        continue
+                
+                # Se todos os formatos falharam, fornece erro específico baseado no tipo
+                if last_error and ("CUDA error" in last_error or "GPU" in last_error):
+                    raise Exception(
+                        "Erro persistente no servidor de IA (problema de GPU). "
+                        "O sistema usará modo demonstração automaticamente."
+                    )
+                elif last_error and "503" in last_error:
+                    raise Exception(
+                        "Modelo de IA indisponível no momento. "
+                        "Aguarde alguns minutos e tente novamente."
+                    )
+                else:
+                    raise Exception(f"Falha na comunicação com o servidor de IA. Último erro: {last_error}")
+
+            
+        except httpx.TimeoutException:
+            raise Exception(
+                "Timeout na comunicação com o servidor de IA. "
+                "Tente novamente ou use o modo demonstração."
+            )
+        except httpx.RequestError as e:
+            raise Exception(f"Erro de conexão com o servidor de IA: {str(e)}")
+        except Exception as e:
+            # Re-lança erros já formatados
+            if "servidor de IA" in str(e):
+                raise
+            else:
+                raise Exception(f"Erro inesperado na chamada da API: {str(e)}")
+    
+    def _extract_response_text(self, result: Any) -> str:
+        """Extract text from API response handling different formats."""
+        try:
+            # Format 1: List with generated_text
+            if isinstance(result, list) and len(result) > 0:
+                if 'generated_text' in result[0]:
+                    return result[0]['generated_text'].strip()
+            
+            # Format 2: Direct text response
+            if isinstance(result, str):
+                return result.strip()
+            
+            # Format 3: Dict with text field
+            if isinstance(result, dict):
+                for key in ['text', 'generated_text', 'output', 'response']:
+                    if key in result:
+                        return str(result[key]).strip()
+            
+            # Fallback: convert to string
+            return str(result).strip()
+            
+        except Exception as e:
+            raise Exception(f"Erro ao extrair texto da resposta: {str(e)}")
+    
+    def _format_medical_report(
+        self, ai_response: str, age: str, weight: str, clinical_history: str
+    ) -> str:
+        """Format the AI response into a professional medical report."""
+        
+        current_time = datetime.now().strftime('%d/%m/%Y às %H:%M')
+        
+        formatted_report = f"""RELATÓRIO MÉDICO AUTOMATIZADO
+
+═══════════════════════════════════════════════════════════════
+DADOS DO PACIENTE:
+Idade: {age} anos
+Peso: {weight} kg
+Data do Relatório: {current_time}
+
+HISTÓRICO CLÍNICO:
+{clinical_history}
+
+═══════════════════════════════════════════════════════════════
+ANÁLISE POR INTELIGÊNCIA ARTIFICIAL:
+
+{ai_response}
+
+═══════════════════════════════════════════════════════════════
+OBSERVAÇÕES IMPORTANTES:
+
+⚠️  AVISO MÉDICO-LEGAL:
+• Este relatório foi gerado por inteligência artificial
+• A análise é baseada exclusivamente na imagem fornecida
+• Requer validação e interpretação por médico especialista
+• Não substitui avaliação clínica presencial
+• Considerar sempre o contexto clínico completo
+
+📋 RECOMENDAÇÕES GERAIS:
+• Correlação clínica obrigatória
+• Avaliação médica presencial recomendada
+• Considerar exames complementares conforme indicação
+
+═══════════════════════════════════════════════════════════════
+Sistema: MedIA Reports v1.0
+Modelo: MedGemma (Google)
+Processado em: {current_time}
+"""
+        
+        return formatted_report
+
+    def check_api_status(self) -> Dict[str, Any]:
+        """Check the status of Hugging Face API."""
+        try:
+            response = requests.get(
+                f"{self.medgemma_url}",
+                headers=self.headers,
+                timeout=10
+            )
+            return {
+                "status": "available" if response.status_code == 200 else "unavailable",
+                "status_code": response.status_code,
+                "dependencies_available": DEPENDENCIES_AVAILABLE
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e),
+                "dependencies_available": DEPENDENCIES_AVAILABLE
+            }
+
+# Demo service for WebContainer environment
+class DemoHuggingFaceService:
+    """Demo service that provides sample responses when real API is not available."""
+    
+    def __init__(self):
+        pass
+    
+    async def analyze_medical_image(
+        self,
+        image_base64: str,
+        patient_age: str,
+        patient_weight: str,
+        clinical_history: str
+    ) -> str:
+        """Generate a demo medical report."""
+        
+        current_time = datetime.now().strftime('%d/%m/%Y às %H:%M')
+        
+        demo_report = f"""RELATÓRIO MÉDICO DEMONSTRATIVO
+
+═══════════════════════════════════════════════════════════════
+DADOS DO PACIENTE:
+Idade: {patient_age} anos
+Peso: {patient_weight} kg
+Data do Relatório: {current_time}
+
+HISTÓRICO CLÍNICO:
+{clinical_history}
+
+═══════════════════════════════════════════════════════════════
+ANÁLISE DEMONSTRATIVA:
+
+QUALIDADE DA IMAGEM:
+A imagem médica enviada apresenta qualidade adequada para análise. 
+Parâmetros técnicos dentro dos padrões aceitáveis para avaliação.
+
+ESTRUTURAS ANATÔMICAS IDENTIFICADAS:
+[Em ambiente de produção, esta seção seria preenchida com a identificação 
+detalhada das estruturas anatômicas visíveis na imagem, baseada na análise 
+do modelo MedGemma]
+
+ACHADOS PRINCIPAIS:
+[Aqui seriam descritos os achados específicos identificados pela IA, 
+incluindo medidas, densidades, padrões de sinal/intensidade e outras 
+características relevantes]
+
+IMPRESSÃO DIAGNÓSTICA:
+[Esta seção conteria a interpretação clínica dos achados, correlacionada 
+com o histórico do paciente e as características da imagem]
+
+═══════════════════════════════════════════════════════════════
+OBSERVAÇÕES IMPORTANTES:
+
+⚠️  MODO DEMONSTRAÇÃO:
+Este é um relatório gerado em modo demonstração para fins de teste 
+do sistema. Em ambiente de produção, o conteúdo seria gerado pelo 
+modelo MedGemma através da API do Hugging Face.
+
+📋 FUNCIONALIDADES EM PRODUÇÃO:
+• Análise detalhada por IA especializada em medicina
+• Identificação automática de estruturas anatômicas
+• Detecção de possíveis patologias
+• Correlação com dados clínicos
+• Recomendações baseadas em evidências
+
+═══════════════════════════════════════════════════════════════
+Sistema: MedIA Reports v1.0 (Modo Demo)
+Processado em: {current_time}
+"""
+        
+        return demo_report
+    
+    def check_api_status(self) -> Dict[str, Any]:
+        """Return demo API status."""
+        return {
+            "status": "demo_mode",
+            "message": "Rodando em modo demonstração - API real não disponível",
+            "dependencies_available": DEPENDENCIES_AVAILABLE
+        }

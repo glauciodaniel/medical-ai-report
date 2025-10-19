@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { image, age, weight, clinical_history } = body;
 
-    // Validate required fields
+    // Validar campos obrigatórios
     if (!image || !age || !weight || !clinical_history) {
       return NextResponse.json(
         { error: "Todos os campos são obrigatórios" },
@@ -16,8 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In a real implementation, you would call your Python backend here
-    // For demo purposes, we'll return a mock response
+    // Para demonstração, retornamos um relatório simulado.
     const mockReport = `RELATÓRIO MÉDICO AUTOMATIZADO
 
 DADOS DO PACIENTE:

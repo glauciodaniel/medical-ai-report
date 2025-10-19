@@ -26,16 +26,25 @@ yarn-error.log*
 
 # local env files
 .env
-.env*.example
 .env*.local
 .env.production
 
 # vercel
 .vercel
 
-
-*.bicep
-*/*.bicep
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Azure
+.azure/
